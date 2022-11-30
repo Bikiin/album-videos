@@ -1,9 +1,50 @@
+<script setup>
+import { ref } from 'vue';
+
+const emit = defineEmits({
+  saveVideos: (items) => {
+    if(items.length){
+      return items
+    }
+    throw 404 
+  }
+})
+const url = ref('')
+const key = 'AIzaSyBmLLu8YlvN9ZhoHIII2VIOANa2ss5kgPA'
+
+function searchVideo(){
+  try{
+    const search = (new URL(url.value)).search
+    const id = search.split('?v=').pop()
+    const endpoint = new URL("https://www.googleapis.com/youtube/v3/videos");
+    endpoint.search = new URLSearchParams({
+      id,
+      key,
+      part: "snippet",
+ 
+    }).toString();
+    fetch(endpoint)
+    .then(response => response.json())
+    .then(videoData => emit('saveVideos', videoData.items))
+    .catch(console.log)
+  }
+  catch(error){
+    if(error?.message.includes('Invalid URL') && url.value.length){
+      console.log('Url invalida')
+    }
+  }
+  finally{
+    url.value = ''
+  }
+}
+</script>
+
 <template>
   <header>
     <h1>Añadir nuevo video</h1>
     <div>
-      <input type="text" name="url" placeholder="Añadir"/>
-      <button>Añadir</button>
+      <input type="text" name="url" v-model="url" placeholder="Añadir"/>
+      <button @click="searchVideo">Añadir</button>
     </div>
   </header>
 </template>
@@ -15,7 +56,7 @@ h1{
 }
 header{
   width: 1076px;
-  margin: 50px auto;
+  margin: 120px auto 134px auto;
 }
 div{
   display: flex;
@@ -37,12 +78,18 @@ button{
   border-radius: 0px 10px 10px 0px;
   border: none;
   color: white;
-  background-color: #136AE4;;
+  background-color: #136AE4;
+  font-weight: 700;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.2), 0px 1px 4px rgba(0, 0, 0, 0.12), 0px 2px 2px rgba(0, 0, 0, 0.14);
+}
+button:hover{
+  cursor: pointer;
 }
 
 @media (max-width: 1090px){
   header{
     width: 90%;
+    margin: 50px auto;
   }
 }
 </style>

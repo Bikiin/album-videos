@@ -1,14 +1,19 @@
 <script setup>
 import MiniatureVue from './MiniatureComponent.vue';
+const props = defineProps({
+  videoList: Array,
+})
+
 </script>
 
 <template>
   <main>
-    <MiniatureVue/>
-    <MiniatureVue/>
-    <MiniatureVue/>
-    <MiniatureVue/>
-    <MiniatureVue/>
+    <MiniatureVue 
+      v-for="(video, index) in props.videoList" 
+      :key="index + '-' + video.id"
+      :video="video" 
+      @delete="$emit('delete', index, video.id)"
+    />
   </main>
 </template>
 
