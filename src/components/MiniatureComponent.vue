@@ -67,7 +67,7 @@ const durationFormat = computed(() => {
           <h2>¿Seguro que quieres eliminar este video?</h2>
           <div class="buttons">
             <button class="button-cancel" @click="showDelete = false">Cancelar</button>
-            <button class="button-delete" @click="$emit('delete')">Eliminar</button>
+            <button class="button-delete" @click="$emit('delete'); showDelete = false">Eliminar</button>
           </div>
         </div>
       </ModalVue>

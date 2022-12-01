@@ -1,22 +1,28 @@
 <script setup>
 import { ref } from 'vue';
 
+
 const emit = defineEmits({
   saveVideos: (items) => {
     if(items.length){
       return items
     }
     throw 404 
-  }
+  },
+  error: (message) => message
 })
 const url = ref('')
 const key = 'AIzaSyBmLLu8YlvN9ZhoHIII2VIOANa2ss5kgPA'
+const express = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w-]+\?v=|embed\/|v\/)?)([\w-]+)(\S+)?$/
+const endpoint = new URL("https://www.googleapis.com/youtube/v3/videos");
 
 function searchVideo(){
   try{
+    if(!express.test(url.value)){
+      throw 400
+    }
     const search = (new URL(url.value)).search
     const id = search.split('?v=').pop()
-    const endpoint = new URL("https://www.googleapis.com/youtube/v3/videos");
     endpoint.search = new URLSearchParams({
       id,
       key,
@@ -26,11 +32,21 @@ function searchVideo(){
     fetch(endpoint)
     .then(response => response.json())
     .then(videoData => emit('saveVideos', videoData.items))
-    .catch(console.log)
+    .catch(error => {
+      if( error === 404) emit('error', 'Video no encontrado')
+    })
   }
   catch(error){
-    if(error?.message.includes('Invalid URL') && url.value.length){
-      console.log('Url invalida')
+    if(!url.value.length){
+      emit('error', 'Ingresa una URL')
+    }
+    else{
+      if(error === 400){
+        emit('error', 'Url invalida')
+      }
+      if(typeof error === 'object' && error?.message.includes('Invalid URL') && url.value.length){
+        emit('error', 'Url invalida')
+      }
     }
   }
   finally{
@@ -60,6 +76,7 @@ header{
 }
 div{
   display: flex;
+  position: relative;
 }
 input{
   width: 76.5%;

@@ -9,10 +9,10 @@ const props = defineProps({
 <template>
   <main>
     <MiniatureVue 
-      v-for="(video, index) in props.videoList" 
-      :key="index + '-' + video.id"
-      :video="video" 
-      @delete="$emit('delete', index, video.id)"
+      v-for="(data, index) in props.videoList" 
+      :key="index + '-' + data.video.id"
+      :video="data.video" 
+      @delete="$emit('delete', data.id)"
     />
   </main>
 </template>
